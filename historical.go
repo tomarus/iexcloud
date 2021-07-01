@@ -23,6 +23,8 @@ const (
 	TwoYearHistorical HistoricalTimeFrame = "2y"
 	// FiveYearHistorical Five year historically adjusted market-wide data
 	FiveYearHistorical HistoricalTimeFrame = "5y"
+	// FiveDayHistorical Five days historically adjusted market-wide data grouped by 10 minute intervals
+	FiveDayHistorical HistoricalTimeFrame = "5dm"
 	// YearToDateHistorical Year to date historically adjusted market-wide data
 	YearToDateHistorical HistoricalTimeFrame = "ytd"
 	// MaxHistorical All available historically adjusted market-wide data up to 15 years
@@ -35,7 +37,8 @@ func (htf HistoricalTimeFrame) Valid() bool {
 	case OneMonthHistorical, ThreeMonthHistorical,
 		SixMonthHistorical, OneYearHistorical,
 		TwoYearHistorical, FiveYearHistorical,
-		YearToDateHistorical, MaxHistorical:
+		YearToDateHistorical, MaxHistorical,
+		FiveDayHistorical:
 		return true
 	default:
 		return false
@@ -70,11 +73,12 @@ type IntradayHistoricalDataPoint struct {
 // HistoricalOptions optional query params to pass to historical endpoint
 // If values are false or 0 they aren't passed.
 type HistoricalOptions struct {
-	ChartCloseOnly  bool `url:"chartCloseOnly,omitempty"`
-	ChartSimplify   bool `url:"chartSimplify,omitempty"`
-	ChartInterval   int  `url:"chartInterval,omitempty"`
-	ChangeFromClose bool `url:"changeFromClose,omitempty"`
-	ChartLast       int  `url:"chartLast,omitempty"`
+	ChartCloseOnly    bool `url:"chartCloseOnly,omitempty"`
+	ChartSimplify     bool `url:"chartSimplify,omitempty"`
+	ChartInterval     int  `url:"chartInterval,omitempty"`
+	ChangeFromClose   bool `url:"changeFromClose,omitempty"`
+	ChartLast         int  `url:"chartLast,omitempty"`
+	ChartIncludeToday bool `url:"includeToday,omitempty"`
 }
 
 // IntradayHistoricalOptions optional query params to pass to intraday historical endpoint
@@ -91,11 +95,12 @@ type IntradayHistoricalOptions struct {
 // HistoricalDataPoint Represents a single historical data point for a stock
 type HistoricalDataPoint struct {
 	Date           string  `json:"date"`
+	Minute         string  `json:"minute"`
 	Open           float64 `json:"open"`
 	Close          float64 `json:"close"`
 	High           float64 `json:"high"`
 	Low            float64 `json:"low"`
-	Volume         int     `json:"volume"`
+	Volume         float64 `json:"volume"`
 	UOpen          float64 `json:"uOpen"`
 	UClose         float64 `json:"uClose"`
 	UHigh          float64 `json:"uHigh"`

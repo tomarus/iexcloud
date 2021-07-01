@@ -1174,6 +1174,14 @@ func (c Client) OptionsSymbols(ctx context.Context) (map[string][]string, error)
 	return r, err
 }
 
+// OptionsSymbolsUnderlying returns slice of OptionsSymbols for an underlying symbol.
+func (c Client) OptionsSymbolsUnderlying(ctx context.Context, symbol string) ([]UnderlyingOptionsSymbols, error) {
+	r := []UnderlyingOptionsSymbols{}
+	endpoint := "/ref-data/options/symbols/" + symbol
+	err := c.GetJSON(ctx, endpoint, &r)
+	return r, err
+}
+
 // OTCSymbols returns an array of Over-the-Counter (OTC) stocks that IEX Cloud
 // supports for API calls.
 func (c Client) OTCSymbols(ctx context.Context) ([]Symbol, error) {

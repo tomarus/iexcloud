@@ -89,3 +89,25 @@ type Sector struct {
 type Tag struct {
 	Name string `json:"name"`
 }
+
+// UnderlyingOptionsSymbols specifies information on options
+// from an underlying symbol.
+type UnderlyingOptionsSymbols struct {
+	Symbol         string  `json:"symbol"`
+	Date           string  `json:"date"`
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+	ExpirationDate string  `json:"expirationDate"`
+	Type           string  `json:"type"`
+	Side           string  `json:"side"`
+	Exercise       string  `json:"exercise"`
+	Strike         float64 `json:"strike"`
+	Underlying     string  `json:"underlying"`
+	Region         string  `json:"region"`
+	Currency       string  `json:"currency"`
+	FIGI           string  `json:"figi"`
+	ContractSize   int     `json:"contractSize"`
+	CFICode        string  `json:"cfiCode"`
+	Exchange       string  `json:"exchange"`
+	ExchangeName   string  `json:"exchangeName"`
+}
