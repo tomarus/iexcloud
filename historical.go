@@ -1,18 +1,27 @@
-// Copyright (c) 2019-2020 The iexcloud developers. All rights reserved.
+// Copyright (c) 2019-2022 The iexcloud developers. All rights reserved.
 // Project site: https://github.com/goinvest/iexcloud
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE file for the project.
 
 package iex
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // HistoricalTimeFrame enum for selecting time frame of historical data
 type HistoricalTimeFrame string
 
 const (
+	// FiveDayHistorical Five days historically adjusted market-wide data
+	FiveDayHistorical HistoricalTimeFrame = "5d"
+	// FiveDay10MinuteHistorical Five days historically adjusted market-wide data in 10 minute intervals
+	FiveDay10MinuteHistorical HistoricalTimeFrame = "5dm"
 	// OneMonthHistorical One month (default) historically adjusted market-wide data
 	OneMonthHistorical HistoricalTimeFrame = "1m"
+	// OneMonth30MinuteHistorical One month historically adjusted market-wide data in 30 minute intervals
+	OneMonth30MinuteHistorical HistoricalTimeFrame = "1mm"
 	// ThreeMonthHistorical Three months historically adjusted market-wide data
 	ThreeMonthHistorical HistoricalTimeFrame = "3m"
 	// SixMonthHistorical Six months historically adjusted market-wide data
@@ -23,8 +32,6 @@ const (
 	TwoYearHistorical HistoricalTimeFrame = "2y"
 	// FiveYearHistorical Five year historically adjusted market-wide data
 	FiveYearHistorical HistoricalTimeFrame = "5y"
-	// FiveDayHistorical Five days historically adjusted market-wide data grouped by 10 minute intervals
-	FiveDayHistorical HistoricalTimeFrame = "5dm"
 	// YearToDateHistorical Year to date historically adjusted market-wide data
 	YearToDateHistorical HistoricalTimeFrame = "ytd"
 	// MaxHistorical All available historically adjusted market-wide data up to 15 years
@@ -34,11 +41,18 @@ const (
 // Valid Determines if HistoricalTimeFrame is a defined constant
 func (htf HistoricalTimeFrame) Valid() bool {
 	switch htf {
-	case OneMonthHistorical, ThreeMonthHistorical,
-		SixMonthHistorical, OneYearHistorical,
-		TwoYearHistorical, FiveYearHistorical,
-		YearToDateHistorical, MaxHistorical,
-		FiveDayHistorical:
+	case
+		FiveDayHistorical,
+		FiveDay10MinuteHistorical,
+		OneMonthHistorical,
+		OneMonth30MinuteHistorical,
+		ThreeMonthHistorical,
+		SixMonthHistorical,
+		OneYearHistorical,
+		TwoYearHistorical,
+		FiveYearHistorical,
+		YearToDateHistorical,
+		MaxHistorical:
 		return true
 	default:
 		return false
@@ -47,7 +61,7 @@ func (htf HistoricalTimeFrame) Valid() bool {
 
 // IntradayHistoricalDataPoint Represents a single intraday data point for a stock
 type IntradayHistoricalDataPoint struct {
-	Date                 string  `json:"date"`
+	Date                 Date    `json:"date"`
 	Minute               string  `json:"minute"`
 	Label                string  `json:"label"`
 	High                 float64 `json:"high"`
@@ -73,12 +87,16 @@ type IntradayHistoricalDataPoint struct {
 // HistoricalOptions optional query params to pass to historical endpoint
 // If values are false or 0 they aren't passed.
 type HistoricalOptions struct {
-	ChartCloseOnly    bool `url:"chartCloseOnly,omitempty"`
-	ChartSimplify     bool `url:"chartSimplify,omitempty"`
-	ChartInterval     int  `url:"chartInterval,omitempty"`
-	ChangeFromClose   bool `url:"changeFromClose,omitempty"`
-	ChartLast         int  `url:"chartLast,omitempty"`
-	ChartIncludeToday bool `url:"includeToday,omitempty"`
+	ChartCloseOnly  bool   `url:"chartCloseOnly,omitempty"`
+	ChartSimplify   bool   `url:"chartSimplify,omitempty"`
+	ChartInterval   int    `url:"chartInterval,omitempty"`
+	ChangeFromClose bool   `url:"changeFromClose,omitempty"`
+	ChartLast       int    `url:"chartLast,omitempty"`
+	DisplayPercent  bool   `url:"displayPercent,omitempty"`
+	Range           string `url:"range,omitempty"`
+	ExactDate       string `url:"exactDate,omitempty"`
+	Sort            string `url:"sort,omitempty"`
+	IncludeToday    bool   `url:"includeToday,omitempty"`
 }
 
 // IntradayHistoricalOptions optional query params to pass to intraday historical endpoint
@@ -94,13 +112,17 @@ type IntradayHistoricalOptions struct {
 
 // HistoricalDataPoint Represents a single historical data point for a stock
 type HistoricalDataPoint struct {
-	Date           string  `json:"date"`
-	Minute         string  `json:"minute"`
-	Open           float64 `json:"open"`
 	Close          float64 `json:"close"`
 	High           float64 `json:"high"`
 	Low            float64 `json:"low"`
-	Volume         float64 `json:"volume"`
+	Open           float64 `json:"open"`
+	Symbol         string  `json:"symbol"`
+	Volume         int     `json:"volume"`
+	ID             string  `json:"id"`
+	Key            string  `json:"key"`
+	Subkey         string  `json:"subkey"`
+	Date           Date    `json:"date"`
+	Minute         string  `json:"minute"`
 	UOpen          float64 `json:"uOpen"`
 	UClose         float64 `json:"uClose"`
 	UHigh          float64 `json:"uHigh"`
@@ -110,6 +132,19 @@ type HistoricalDataPoint struct {
 	ChangePercent  float64 `json:"changePercent"`
 	Label          string  `json:"label"`
 	ChangeOverTime float64 `json:"changeOverTime"`
+}
+
+// Time merges HistoricalDataPoint's Date and Mintue field and
+// get the exact time. Useful for "5dm" and "1mm" time frames
+func (p HistoricalDataPoint) Time() time.Time {
+	if p.Minute == "" {
+		return time.Time(p.Date)
+	}
+
+	layout := "2006-01-02 15:04"
+	dateStr := fmt.Sprintf("%s %s", p.Date.String(), p.Minute)
+	t, _ := time.Parse(layout, dateStr)
+	return t
 }
 
 // IntradayOptions optional query params to pass to intraday endpoint
@@ -126,6 +161,6 @@ type IntradayOptions struct {
 }
 
 // SetExactDate formats a given date as IEX expects
-func (opt IntradayOptions) SetExactDate(day time.Time) {
+func (opt *IntradayOptions) SetExactDate(day time.Time) {
 	opt.ExactDate = day.Format("20060102")
 }

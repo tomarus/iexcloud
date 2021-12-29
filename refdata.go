@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2020 The iexcloud developers. All rights reserved.
+// Copyright (c) 2019-2022 The iexcloud developers. All rights reserved.
 // Project site: https://github.com/goinvest/iexcloud
 // Use of this source code is governed by a MIT-style license that
 // can be found in the LICENSE file for the project.
@@ -25,6 +25,17 @@ type Symbol struct {
 	Region    string `json:"region"`
 	Currency  string `json:"currency"`
 	IsEnabled bool   `json:"isEnabled"`
+}
+
+// SearchResult models the data for a single search result.
+type SearchResult struct {
+	Symbol       string `json:"symbol"`
+	SecurityName string `json:"securityName"`
+	SecurityType string `json:"securityType"`
+	Region       string `json:"region"`
+	Exchange     string `json:"exchange"`
+	Sector       string `json:"sector"`
+	CIK          string `json:"cik"`
 }
 
 // USExchange provides information about one U.S. exchange including the name,
