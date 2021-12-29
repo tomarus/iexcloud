@@ -30,6 +30,10 @@ func (d *Date) UnmarshalJSON(data []byte) error {
 	}
 	// FIXME: If we receive a blank date, do we want to return an error instead
 	// of a magic string?
+	if aux == "0000-00-00" {
+		*d = Date(time.Time{})
+		return nil
+	}
 	if aux == "" {
 		aux = "1929-10-24"
 	}
