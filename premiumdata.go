@@ -5,6 +5,39 @@
 
 package iex
 
+type InvisageRecommendation struct {
+	Symbol                    string    `json:"symbol"`
+	AnalystCount              int       `json:"analystCount"`
+	ConsensusDate             string    `json:"consensusDate"`
+	SmartConsensus            float64   `json:"smartConsensus"`
+	SmartConsensusTargetPrice float64   `json:"smartConsensusTargetPrice"`
+	TopAnalystFactorValue     float64   `json:"topAnalystFactorValue"`
+	TopAnalystTargetPrice     float64   `json:"topAnalystTargetPrice"`
+	TopAnalystName            string    `json:"topAnalystName"`
+	TopAnalystPerformance     float64   `json:"topAnalystPerformance"`
+	ID                        string    `json:"id"`
+	Key                       string    `json:"key"`
+	Subkey                    string    `json:"subkey"`
+	Date                      EpochTime `json:"date"`
+	Updated                   EpochTime `json:"updated"`
+}
+
+type KavoutScore struct {
+	ID            string    `json:"id"`
+	Key           string    `json:"key"`
+	Subkey        string    `json:"subkey"`
+	Symbol        string    `json:"symbol"`
+	CompanyName   string    `json:"companyName"`
+	TradeDate     string    `json:"tradeDate"`
+	KScore        int       `json:"kscore"`
+	QualityScore  int       `json:"qualityScore"`
+	GrowthScore   int       `json:"growthScore"`
+	ValueScore    int       `json:"valueScore"`
+	MomentumScore int       `json:"momentumScore"`
+	Date          EpochTime `json:"date"`
+	Updated       EpochTime `json:"updated"`
+}
+
 // Recommendation models the buy, hold, sell recommendations for a stock.
 type Recommendation struct {
 	BuyRatings                  int       `json:"ratingBuy"`

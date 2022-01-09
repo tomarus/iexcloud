@@ -1456,6 +1456,25 @@ func (c Client) IntradayStats(ctx context.Context, symbol string) (IntradayStats
 //
 //////////////////////////////////////////////////////////////////////////////
 
+// InvisageAnalystRecommendations retrieves the data from
+// the invisage analyst recommendations endpoint.
+// Take note each call to this function uses 50.000 premium credits at the time of writing.
+func (c Client) InvisageAnalystRecommendations(ctx context.Context, symbol string, num int) ([]InvisageRecommendation, error) {
+	r := []InvisageRecommendation{}
+	endpoint := fmt.Sprintf("/time-series/PREMIUM_INVISAGE_ESTIMATES/%s?last=%d", url.PathEscape(symbol), num)
+	err := c.GetJSON(ctx, endpoint, &r)
+	return r, err
+}
+
+// KScore retrieves the Kavout Score for a given symbol.
+// Take note each call to this function uses 126.263 premium credits at the time of writing.
+func (c Client) KScore(ctx context.Context, symbol string) ([]KavoutScore, error) {
+	r := []KavoutScore{}
+	endpoint := fmt.Sprintf("/time-series/PREMIUM_KAVOUT_KSCORE/%s", url.PathEscape(symbol))
+	err := c.GetJSON(ctx, endpoint, &r)
+	return r, err
+}
+
 //////////////////////////////////////////////////////////////////////////////
 //
 // Refinitiv Endpoints
